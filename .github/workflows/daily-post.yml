@@ -1,12 +1,19 @@
-name: Daily Instagram post
+﻿name: Daily Instagram post
 
 on:
   schedule:
     - cron: "30 3 * * *"   # 03:30 UTC = 9:00 AM India time
+    - cron: "45 3 * * *"   # backups, in case GitHub is late (the job never posts twice)
+    - cron: "5 4 * * *"
+    - cron: "35 4 * * *"
   workflow_dispatch:        # lets you run it by hand from the GitHub app
 
 permissions:
   contents: write
+
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
 
 jobs:
   post:
@@ -27,3 +34,4 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add queue/schedule.json
           git diff --cached --quiet || (git commit -m "Mark ad as posted" && git push)
+
